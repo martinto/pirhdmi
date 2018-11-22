@@ -24,8 +24,17 @@ def hdmi_off():
     print("HDMI Off")
     subprocess.run([TVSERVICE, '-o'])
 
-def hdmi_on():
+def start_off_timer():
     global timer
+    timer = threading.Timer(ON_TIME, lambda: hdmi_off())
+    timer.start()
+
+def restart_off_timer():
+    global timer
+    timer.cancel()
+    start_off_timer()
+
+def hdmi_on():
     if is_off():
         print("HDMI On");
         subprocess.run([TVSERVICE, '-p'])
@@ -36,16 +45,12 @@ def hdmi_on():
         else:
             subprocess.run([CHVT, '1'])
             subprocess.run([CHVT, curr_vt])
-        timer = threading.Timer(ON_TIME, lambda: hdmi_off())
-        timer.start()
+        start_off_timer()
     else:
         print("Reset timer")
-        timer.cancel()
-        timer = threading.Timer(ON_TIME, lambda: hdmi_off())
-        timer.start()
+        restart_off_timer()
 
 pir.when_motion = lambda : hdmi_on()
-#pir.when_no_motion = lambda : hdmi_off()
 
 hdmi_off()
 pause()
