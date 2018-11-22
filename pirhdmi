@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+import subprocess
+from gpiozero import MotionSensor
+from signal import pause
+pir = MotionSensor(4)
+TVSERVICE='/usr/bin/tvservice'
+FGCONSOLE='/bin/fgconsole'
+CHVT='/bin/chvt'
+
+def is_off():
+	status = subprocess.check_output([TVSERVICE, "-s"]).decode("utf-8")
+	if "TV is off" in status:
+		return True
+	else:
+		return False
+
+def fgconsole():
+	return subprocess.check_output([FGCONSOLE]).decode("utf-8").rstrip()
+
+def hdmi_off():
+	print("HDMI Off")
+	subprocess.run([TVSERVICE, '-o'])
+
+def hdmi_on():
+	print("HDMI On");
+	if is_off():
+		subprocess.run([TVSERVICE, '-p'])
+		curr_vt=fgconsole()
+		if curr_vt == '1':
+			subprocess.run([CHVT, '2'])
+			subprocess.run([CHVT, '1'])
+		else:
+			subprocess.run([CHVT, '1'])
+			subprocess.run([CHVT, curr_vt])
+
+pir.when_motion = lambda : hdmi_on()
+pir.when_no_motion = lambda : hdmi_off()
+
+pause()
+
