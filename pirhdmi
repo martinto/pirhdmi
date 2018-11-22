@@ -21,7 +21,6 @@ def fgconsole():
     return subprocess.check_output([FGCONSOLE]).decode("utf-8").rstrip()
 
 def hdmi_off():
-    print("HDMI Off")
     subprocess.run([TVSERVICE, '-o'])
 
 def start_off_timer():
@@ -36,7 +35,6 @@ def restart_off_timer():
 
 def hdmi_on():
     if is_off():
-        print("HDMI On");
         subprocess.run([TVSERVICE, '-p'])
         curr_vt=fgconsole()
         if curr_vt == '1':
@@ -47,7 +45,6 @@ def hdmi_on():
             subprocess.run([CHVT, curr_vt])
         start_off_timer()
     else:
-        print("Reset timer")
         restart_off_timer()
 
 pir.when_motion = lambda : hdmi_on()
