@@ -8,7 +8,7 @@ pir = MotionSensor(4)
 TVSERVICE='/usr/bin/tvservice'
 FGCONSOLE='/bin/fgconsole'
 CHVT='/bin/chvt'
-ON_TIME=30.0
+ON_TIME=120.0
 
 def is_off():
     status = subprocess.check_output([TVSERVICE, "-s"]).decode("utf-8")
