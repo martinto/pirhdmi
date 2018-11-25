@@ -17,3 +17,7 @@ The timer is set to two minutes, to change that edit <code>pirhdi</code> and cha
 ## Requirements
 
 The script is written in python3 and a full install of Raspbian is needed to run it.
+
+## PI Wiring
+
+Connect the PIR power to pin 2, ground to pin 6 and signal to pin 7
