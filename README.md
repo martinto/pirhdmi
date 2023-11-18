@@ -28,6 +28,8 @@ xhost + local:
 
 Use raspi-config to enable the overlay file system to protect the SD card.
 
+Screen blanking *must* be on in `raspi-config`
+
 ## PI Wiring
 
 Connect the PIR power to pin 2, ground to pin 6 and signal to pin 7

@@ -9,7 +9,7 @@ from gpiozero import MotionSensor
 from signal import pause
 pir = MotionSensor(4)
 KMSPRINT='/usr/bin/kmsprint'
-XRANDR='/usr/bin/xrandr'
+XSET='/usr/bin/xset'
 ON_TIME=120.0
 
 def is_off():
@@ -23,7 +23,7 @@ def hdmi_off():
     done=False
     while not done:
         try:
-            subprocess.run([XRANDR, '--output', 'HDMI-1', '--off'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
+            subprocess.run([XSET, 'dpms', 'force', 'standby'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
             print('hdmi_off', file=sys.stderr)
             done=True
         except:
@@ -51,7 +51,7 @@ def hdmi_on():
     while not done:
         try:
             if is_off():
-                subprocess.run([XRANDR, '--output', 'HDMI-1', '--auto', '--rotate', 'left'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
+                subprocess.run([XSET, 'dpms', 'force', 'on'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
                 print('hdmi_on', file=sys.stderr)
                 start_off_timer()
             else:
