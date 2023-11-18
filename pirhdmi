@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
 
+import os
 import subprocess
 import threading
 from gpiozero import MotionSensor
 from signal import pause
 pir = MotionSensor(4)
-TVSERVICE='/usr/bin/tvservice'
-FGCONSOLE='/bin/fgconsole'
-CHVT='/bin/chvt'
+KMSPRINT='/usr/bin/kmsprint'
+XRANDR='/usr/bin/xrandr'
 ON_TIME=120.0
 
 def is_off():
-    status = subprocess.check_output([TVSERVICE, "-s"]).decode("utf-8")
-    if "TV is off" in status:
-        return True
-    else:
+    status = subprocess.check_output([KMSPRINT, "-p"]).decode("utf-8")
+    if "    DPMS (2) = 0 (On) [On=0|Standby=1|Suspend=2|Off=3]" in status:
         return False
-
-def fgconsole():
-    return subprocess.check_output([FGCONSOLE]).decode("utf-8").rstrip()
+    else:
+        return True
 
 def hdmi_off():
-    subprocess.run([TVSERVICE, '-o'])
+    subprocess.run([XRANDR, '--output', 'HDMI-1', '--off'], env=dict(os.environ, DISPLAY=":0"))
 
 def start_off_timer():
     global timer
@@ -35,14 +32,7 @@ def restart_off_timer():
 
 def hdmi_on():
     if is_off():
-        subprocess.run([TVSERVICE, '-p'])
-        curr_vt=fgconsole()
-        if curr_vt == '1':
-            subprocess.run([CHVT, '2'])
-            subprocess.run([CHVT, '1'])
-        else:
-            subprocess.run([CHVT, '1'])
-            subprocess.run([CHVT, curr_vt])
+        subprocess.run([XRANDR, '--output', 'HDMI-1', '--auto', '--rotate', 'left'], env=dict(os.environ, DISPLAY=":0"))
         start_off_timer()
     else:
         restart_off_timer()
@@ -51,4 +41,3 @@ pir.when_motion = lambda : hdmi_on()
 
 hdmi_off()
 pause()
-
