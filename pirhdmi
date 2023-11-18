@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import subprocess
+import time
 import threading
 from gpiozero import MotionSensor
 from signal import pause
@@ -18,26 +20,48 @@ def is_off():
         return True
 
 def hdmi_off():
-    subprocess.run([XRANDR, '--output', 'HDMI-1', '--off'], env=dict(os.environ, DISPLAY=":0"))
+    done=False
+    while not done:
+        try:
+            subprocess.run([XRANDR, '--output', 'HDMI-1', '--off'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
+            print('hdmi_off', file=sys.stderr)
+            done=True
+        except:
+            print('hdmi_off failed', file=sys.stderr)
+            time.sleep(1)
 
 def start_off_timer():
-    global timer
-    timer = threading.Timer(ON_TIME, lambda: hdmi_off())
-    timer.start()
+    try:
+        global timer
+        timer = threading.Timer(ON_TIME, lambda: hdmi_off())
+        timer.start()
+    except:
+        print('start_off_timer failed', file=sys.stderr)
 
 def restart_off_timer():
-    global timer
-    timer.cancel()
-    start_off_timer()
+    try:
+        global timer
+        timer.cancel()
+        start_off_timer()
+    except:
+        print('restart_off_timer failed', file=sys.stderr)
 
 def hdmi_on():
-    if is_off():
-        subprocess.run([XRANDR, '--output', 'HDMI-1', '--auto', '--rotate', 'left'], env=dict(os.environ, DISPLAY=":0"))
-        start_off_timer()
-    else:
-        restart_off_timer()
+    done=False
+    while not done:
+        try:
+            if is_off():
+                subprocess.run([XRANDR, '--output', 'HDMI-1', '--auto', '--rotate', 'left'], env=dict(os.environ, DISPLAY=":0", XAUTHORITY="/home/martin/.Xauthority"))
+                print('hdmi_on', file=sys.stderr)
+                start_off_timer()
+            else:
+                restart_off_timer()
+            done=True
+        except:
+            print('hdmi_on failed', file=sys.stderr)
+            time.sleep(1)
 
 pir.when_motion = lambda : hdmi_on()
 
-hdmi_off()
+start_off_timer()
 pause()

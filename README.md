@@ -18,6 +18,16 @@ The timer is set to two minutes, to change that edit <code>pirhdi</code> and cha
 
 The script is written in python3 and a full install of Raspbian is needed to run it.
 
+Add this to /etc/xdg/lxsession/LXDE-pi/autostart
+
+```
+unclutter -idle 0.5 -root &
+xhost + local:
+/usr/bin/chromium-browser --noerrdialogs --disable-infobars --kiosk --app=<DAKBoard GUID>
+```
+
+Use raspi-config to enable the overlay file system to protect the SD card.
+
 ## PI Wiring
 
 Connect the PIR power to pin 2, ground to pin 6 and signal to pin 7
